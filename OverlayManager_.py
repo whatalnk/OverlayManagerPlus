@@ -10,7 +10,7 @@ from ij.gui import Overlay, GenericDialog
 
 from fiji.util.gui import GenericDialogPlus
 from java.awt.event import ActionListener
-from java.awt import GridLayout
+from java.awt import GridLayout, Dimension, GridBagLayout, GridBagConstraints
 from javax.swing import JButton, JPanel
 from javax.swing import JList, DefaultListModel
 from javax.swing import JTable, JScrollPane
@@ -28,36 +28,55 @@ class OverlayManager():
     def __init__(self):
         frame = PlugInFrame("Overlay Manager")
         frame.setSize(300, 600)
-        frame.setLayout(GridLayout(1, 2))
+        layout = GridBagLayout()
+        frame.setLayout(layout)
+        gbc = GridBagConstraints()
+        
         # left
         p1 = JPanel()
+        p1.setMinimumSize(Dimension(200, 560))
         p1.setLayout(GridLayout(1, 1))
+        gbc.gridx = 0
+        gbc.gridy = 0
+        gbc.fill = GridBagConstraints.BOTH
+        layout.setConstraints(p1, gbc)
         frame.add(p1)
         
         ## left component
         tblModel = checkBoxTableModel(["ROI name", "Overlay"], 0)
         self.tbl = JTable(tblModel)
-        # self.l = JList(DefaultListModel())
+        self.tbl.getColumn("Overlay").setPreferredWidth(10)
+        self.tbl.setRowHeight(20)
         sp = JScrollPane(self.tbl)
         p1.add(sp)
 
         # right
         p2 = JPanel()
-        p2.setLayout(GridLayout(3, 1))
+        p2.setLayout(GridLayout(15, 1))
+        gbc.gridx = 1
+        gbc.gridy = 0
+        layout.setConstraints(p2, gbc)
         frame.add(p2)
 
         # right component
-        b1 = JButton('Add Roi', actionPerformed = self.add_ROI)
-        p2.add(b1)
-        b2 = JButton('Delete ROI', actionPerformed = self.del_ROI)
-        p2.add(b2)
+        b_add_roi = JButton('Add ROI', actionPerformed = self.add_roi)
+        p2.add(b_add_roi)
+        b_del_roi = JButton('Delete ROI', actionPerformed = self.del_roi)
+        p2.add(b_del_roi)
+        b_draw = JButton('Draw', actionPerformed = self.draw_overlay)
+        p2.add(b_draw)
+        b_save = JButton('Save', actionPerformed = self.save_roi)
+        p2.add(b_save)
+        b_load = JButton('Load', actionPerformed = self.load_roi)
+        p2.add(b_load)
+                
         frame.visible = True
 
-    def add_ROI(self, event):
+    def add_roi(self, event):
         tblModel = self.tbl.getModel()
         tblModel.addRow(["name", False])
 
-    def del_ROI(self, event):
+    def del_roi(self, event):
         tbl = self.tbl
         i = tbl.getSelectedRow()
         if i == -1:
@@ -73,6 +92,15 @@ class OverlayManager():
             gd.showDialog()
             if gd.wasOKed():
                 tbl.getModel().removeRow(i)
+
+    def draw_overlay(self, event):
+        pass
+
+    def save_roi(self, event):
+        pass
+
+    def load_roi(self, event):
+        pass
 
 if __name__ == '__main__':
     OverlayManager()
