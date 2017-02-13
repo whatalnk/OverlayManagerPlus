@@ -13,9 +13,9 @@ from java.awt.event import ActionListener
 from java.awt import GridLayout, Dimension, GridBagLayout, GridBagConstraints
 from javax.swing import JButton, JPanel
 from javax.swing import JList, DefaultListModel
-from javax.swing import JTable, JScrollPane
+from javax.swing import JTable, JScrollPane, BoxLayout
 from javax.swing.table import DefaultTableModel
-import java.lang .Boolean as JBool
+import java.lang.Boolean as JBool
 
 class checkBoxTableModel(DefaultTableModel):
     def getColumnClass(self, col):
@@ -28,37 +28,27 @@ class OverlayManager():
     def __init__(self):
         frame = PlugInFrame("Overlay Manager")
         frame.setSize(300, 600)
-        layout = GridBagLayout()
-        frame.setLayout(layout)
-        gbc = GridBagConstraints()
-        
-        # left
-        p1 = JPanel()
-        p1.setMinimumSize(Dimension(200, 560))
-        p1.setLayout(GridLayout(1, 1))
-        gbc.gridx = 0
-        gbc.gridy = 0
-        gbc.fill = GridBagConstraints.BOTH
-        layout.setConstraints(p1, gbc)
-        frame.add(p1)
-        
-        ## left component
+
+        # Parent
+        p = JPanel()
+        p.setLayout(BoxLayout(p, BoxLayout.X_AXIS))
+        frame.add(p)
+
+        # Left
         tblModel = checkBoxTableModel(["ROI name", "Overlay"], 0)
         self.tbl = JTable(tblModel)
-        self.tbl.getColumn("Overlay").setPreferredWidth(10)
+        self.tbl.getColumn("Overlay").setMaxWidth(100)
         self.tbl.setRowHeight(20)
+        self.tbl.getColumnModel().setColumnMargin(10)
         sp = JScrollPane(self.tbl)
-        p1.add(sp)
+        p.add(sp)
 
-        # right
+        # Right
         p2 = JPanel()
         p2.setLayout(GridLayout(15, 1))
-        gbc.gridx = 1
-        gbc.gridy = 0
-        layout.setConstraints(p2, gbc)
-        frame.add(p2)
+        p.add(p2)
 
-        # right component
+        # Right component
         b_add_roi = JButton('Add ROI', actionPerformed = self.add_roi)
         p2.add(b_add_roi)
         b_del_roi = JButton('Delete ROI', actionPerformed = self.del_roi)
@@ -69,7 +59,7 @@ class OverlayManager():
         p2.add(b_save)
         b_load = JButton('Load', actionPerformed = self.load_roi)
         p2.add(b_load)
-                
+
         frame.visible = True
 
     def add_roi(self, event):
