@@ -15,6 +15,7 @@ from javax.swing import JButton, JPanel
 from javax.swing import JList, DefaultListModel
 from javax.swing import JTable, JScrollPane, BoxLayout
 from javax.swing.table import DefaultTableModel
+from javax.swing.event import TableModelListener
 import java.lang.Boolean as JBool
 
 class checkBoxTableModel(DefaultTableModel):
@@ -24,8 +25,18 @@ class checkBoxTableModel(DefaultTableModel):
         elif col == 1:
             return(JBool)
 
+class checkBoxTableListener(TableModelListener):
+    def __init__(self, overlayManager):
+        self.overlayManager = overlayManager
+    def tableChanged(self, event):
+        print(self.overlayManager.handle_tableChanged(event))
+
 class OverlayManager():
     def __init__(self):
+        self.roi = dict()
+        self.overlay = Overlay()
+        self.imp = IJ.getImage()
+
         frame = PlugInFrame("Overlay Manager")
         frame.setSize(300, 600)
 
@@ -36,13 +47,14 @@ class OverlayManager():
 
         # Left
         tblModel = checkBoxTableModel(["ROI name", "Overlay"], 0)
+        tblModel.addTableModelListener(checkBoxTableListener(self))
         self.tbl = JTable(tblModel)
         self.tbl.getColumn("Overlay").setMaxWidth(100)
         self.tbl.setRowHeight(20)
         self.tbl.getColumnModel().setColumnMargin(10)
         sp = JScrollPane(self.tbl)
         p.add(sp)
-
+        
         # Right
         p2 = JPanel()
         p2.setLayout(GridLayout(15, 1))
@@ -97,6 +109,30 @@ class OverlayManager():
 
     def load_roi(self, event):
         pass
+    
+    def handle_tableChanged(self, event):
+        if event.getType() == 0 and event.getColumn() == 1:
+            i = event.getFirstRow()
+            tblModel = event.source
+            v = tblModel.getValueAt(i, 1) # value after event
+            roiname = tblModel.getValueAt(i, 0)
+            if v:
+                # Add ROI to Overlay
+                self.overlay.add(self.roi[roiname])
+                # Draw
+                self.imp.setOverlay(self.overlay)
+            else:
+                # Delete ROI from Overlay
+                self.overlay.remove(self.roi[roiname])
+                # Draw
+                self.imp.setOverlay(self.overlay)
+
+    def add_overlay(self):
+        pass
+
+    def del_overlay(self):
+        pass
+
 
 if __name__ == '__main__':
     OverlayManager()
