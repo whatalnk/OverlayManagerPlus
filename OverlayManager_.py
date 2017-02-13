@@ -64,7 +64,13 @@ class OverlayManager():
 
     def add_roi(self, event):
         tblModel = self.tbl.getModel()
-        tblModel.addRow(["name", False])
+        gd = GenericDialog("ROI Name")
+        gd.addStringField("Name ?", "ROI", 10)
+        gd.showDialog()
+        s = gd.getNextString()
+        if s == "":
+            s = "ROI"
+        tblModel.addRow([s, False])
 
     def del_roi(self, event):
         tbl = self.tbl
