@@ -139,7 +139,11 @@ class OverlayManager():
             elif t_ == 10:
                 data.append(self.pointRoiToDict(k, v))
         res = dict({"imagePath": self.imagePath, "data": data})
-        print(json.dumps(res))
+        fn = IJ.getFilePath("Save result to: ")
+        if fn is None:
+            return 0
+        with open(fn, 'w') as f:
+            json.dump(res, f)
     
     def lineRoiToDict(self, k, roi):
         p = roi.getFloatPoints()
