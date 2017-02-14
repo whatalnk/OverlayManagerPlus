@@ -2,7 +2,7 @@ from __future__ import with_statement
 import os
 from itertools import izip, repeat, chain
 import java.lang.Float as JFloat
-from ij import IJ, ImagePlus
+from ij import IJ, ImagePlus, WindowManager
 from ij.plugin.frame import RoiManager, PlugInFrame
 from ij.io import OpenDialog
 from ij.measure import ResultsTable
@@ -35,6 +35,10 @@ class OverlayManager():
     def __init__(self):
         self.roi = dict()
         self.overlay = Overlay()
+        self.roicount = 0
+        imp = WindowManager.getCurrentImage()
+        if imp is not None:
+            self.imp = imp
 
     def run(self):
         frame = PlugInFrame("Overlay Manager")
@@ -67,8 +71,6 @@ class OverlayManager():
         p2.add(b_add_roi)
         b_del_roi = JButton('Delete ROI', actionPerformed = self.del_roi)
         p2.add(b_del_roi)
-        b_draw = JButton('Draw', actionPerformed = self.draw_overlay)
-        p2.add(b_draw)
         b_save = JButton('Save', actionPerformed = self.save_roi)
         p2.add(b_save)
         b_load = JButton('Load', actionPerformed = self.load_roi)
@@ -85,14 +87,27 @@ class OverlayManager():
         self.imp.show()
 
     def add_roi(self, event):
+        selection = self.imp.getRoi()
+        if selection is None:
+            IJ.error("No selection")
+            return 0
         tblModel = self.tbl.getModel()
-        gd = GenericDialog("ROI Name")
-        gd.addStringField("Name ?", "ROI", 10)
-        gd.showDialog()
-        s = gd.getNextString()
+        while True:
+            gd = GenericDialog("ROI name")
+            gd.addStringField("Name ?", "ROI%04d" % self.roicount, 10)
+            gd.showDialog()
+            s = gd.getNextString()
+            if gd.wasCanceled():
+                return
+            elif s not in self.roi.keys():
+                break
+            else:
+                IJ.error("ROI name already used. Please use different one")
         if s == "":
-            s = "ROI"
+            s = "ROI%04d" % self.roicount
+        self.roi[s] = selection
         tblModel.addRow([s, False])
+        self.roicount += 1
 
     def del_roi(self, event):
         tbl = self.tbl
@@ -110,9 +125,6 @@ class OverlayManager():
             gd.showDialog()
             if gd.wasOKed():
                 tbl.getModel().removeRow(i)
-
-    def draw_overlay(self, event):
-        pass
 
     def save_roi(self, event):
         pass
@@ -136,13 +148,6 @@ class OverlayManager():
                 self.overlay.remove(self.roi[roiname])
                 # Draw
                 self.imp.setOverlay(self.overlay)
-
-    def add_overlay(self):
-        pass
-
-    def del_overlay(self):
-        pass
-
 
 if __name__ == '__main__':
     OverlayManager().run()
