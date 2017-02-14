@@ -13,6 +13,7 @@ from javax.swing.table import DefaultTableModel
 from javax.swing.event import TableModelListener
 
 class checkBoxTableModel(DefaultTableModel):
+    import java.lang.Boolean as JBool
     def getColumnClass(self, col):
         if col == 0:
             return(str)
@@ -25,7 +26,7 @@ class checkBoxTableListener(TableModelListener):
     def tableChanged(self, event):
         self.overlayManagerPlus.handle_tableChanged(event)
 
-class OverlayManagerPlus():
+class OverlayManagerPlus(object):
     def __init__(self):
         self.roi = dict()
         self.overlay = Overlay()
@@ -35,7 +36,7 @@ class OverlayManagerPlus():
             self.imp = imp
             self.imagePath = os.path.join(imp.getOriginalFileInfo().directory, imp.getOriginalFileInfo().fileName)
 
-    def run_(self):
+    def run(self):
         frame = PlugInFrame("Overlay Manager")
         frame.setSize(300, 600)
 
@@ -120,8 +121,8 @@ class OverlayManagerPlus():
             gd.showDialog()
             if gd.wasOKed():
                 tbl.getModel().removeRow(i)
-                del self.roi[v]
                 self.del_overlay(v)
+                del self.roi[v]
 
     def save_roi(self, event):
         data = []
@@ -155,9 +156,6 @@ class OverlayManagerPlus():
             return
         with open(fn, 'r') as f:
             res = json.load(f)
-        self.imagePath = res["imagePath"]
-        self.imp = IJ.openImage(self.imagePath)
-        self.imp.show()
         for e in res["data"]:
             if e["type"] == 5:
                 self.roi[e["name"]] = Line(e["ox1"], e["oy1"], e["ox2"], e["oy2"])
@@ -166,6 +164,9 @@ class OverlayManagerPlus():
         tblModel = self.tbl.getModel()
         for k in self.roi:
             tblModel.addRow([k, False])
+        self.imagePath = res["imagePath"]
+        self.imp = IJ.openImage(self.imagePath)
+        self.imp.show()
 
     def handle_tableChanged(self, event):
         if event.getType() == 0 and event.getColumn() == 1:
@@ -188,5 +189,4 @@ class OverlayManagerPlus():
         self.imp.setOverlay(self.overlay)
 
 if __name__ == '__main__':
-    overlayManagerPlus = OverlayManagerPlus()
-    overlayManagerPlus.run_()
+    OverlayManagerPlus().run()
