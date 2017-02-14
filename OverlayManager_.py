@@ -35,8 +35,8 @@ class OverlayManager():
     def __init__(self):
         self.roi = dict()
         self.overlay = Overlay()
-        self.imp = IJ.getImage()
 
+    def run(self):
         frame = PlugInFrame("Overlay Manager")
         frame.setSize(300, 600)
 
@@ -61,6 +61,8 @@ class OverlayManager():
         p.add(p2)
 
         # Right component
+        b_open = JButton('Open Image', actionPerformed = self.openImage)
+        p2.add(b_open)
         b_add_roi = JButton('Add ROI', actionPerformed = self.add_roi)
         p2.add(b_add_roi)
         b_del_roi = JButton('Delete ROI', actionPerformed = self.del_roi)
@@ -73,6 +75,14 @@ class OverlayManager():
         p2.add(b_load)
 
         frame.visible = True
+
+    def openImage(self, event):
+        imagePath = IJ.getFilePath("Choose image")
+        if imagePath is None:
+            return 0
+        self.imagePath = imagePath
+        self.imp = IJ.openImage(imagePath)
+        self.imp.show()
 
     def add_roi(self, event):
         tblModel = self.tbl.getModel()
@@ -135,7 +145,7 @@ class OverlayManager():
 
 
 if __name__ == '__main__':
-    OverlayManager()
+    OverlayManager().run()
 #imp = IJ.getImage()
 #roi = imp.getRoi()
 #roi.setName("PC0202l")
