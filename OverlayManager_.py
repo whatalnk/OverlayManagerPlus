@@ -17,6 +17,8 @@ from javax.swing import JTable, JScrollPane, BoxLayout
 from javax.swing.table import DefaultTableModel
 from javax.swing.event import TableModelListener
 import java.lang.Boolean as JBool
+import json
+import os.path
 
 class checkBoxTableModel(DefaultTableModel):
     def getColumnClass(self, col):
@@ -39,6 +41,7 @@ class OverlayManager():
         imp = WindowManager.getCurrentImage()
         if imp is not None:
             self.imp = imp
+            self.imagePath = os.path.join(imp.getOriginalFileInfo().directory, imp.getOriginalFileInfo().fileName)
 
     def run(self):
         frame = PlugInFrame("Overlay Manager")
@@ -127,11 +130,36 @@ class OverlayManager():
                 tbl.getModel().removeRow(i)
 
     def save_roi(self, event):
-        pass
+        data = []
+        for k in self.roi:
+            v = self.roi[k]
+            t_ = v.getType()
+            if t_ == 5:
+                data.append(self.lineRoiToDict(k, v)) 
+            elif t_ == 10:
+                data.append(self.pointRoiToDict(k, v))
+        res = dict({"imagePath": self.imagePath, "data": data})
+        print(json.dumps(res))
+    
+    def lineRoiToDict(self, k, roi):
+        p = roi.getFloatPoints()
+        px = p.xpoints.tolist()
+        py = p.ypoints.tolist()
+        return(dict({"type": 5, "name": k, "ox1": px[0], "oy1": py[0], "ox2": px[1], "oy2": py[1]}))
+
+    def pointRoiToDict(self, k, roi):
+        p = roi.getContainedFloatPoints()
+        return(dict({"type": 10, "name": k, "ox": p.xpoints.tolist(), "oy": p.ypoints.tolist()}))
 
     def load_roi(self, event):
         pass
-    
+
+    def dictToLineRoi(self, roi):
+        pass
+
+    def dictToPointRoi(self, roi):
+        pass    
+
     def handle_tableChanged(self, event):
         if event.getType() == 0 and event.getColumn() == 1:
             i = event.getFirstRow()
