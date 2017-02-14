@@ -6,7 +6,7 @@ from ij import IJ, ImagePlus, WindowManager
 from ij.plugin.frame import RoiManager, PlugInFrame
 from ij.io import OpenDialog
 from ij.measure import ResultsTable
-from ij.gui import Overlay, GenericDialog
+from ij.gui import Overlay, GenericDialog, Line, PointRoi
 
 from fiji.util.gui import GenericDialogPlus
 from java.awt.event import ActionListener
@@ -156,13 +156,22 @@ class OverlayManager():
         return(dict({"type": 10, "name": k, "ox": p.xpoints.tolist(), "oy": p.ypoints.tolist()}))
 
     def load_roi(self, event):
-        pass
-
-    def dictToLineRoi(self, roi):
-        pass
-
-    def dictToPointRoi(self, roi):
-        pass    
+        fn = IJ.getFilePath("Load result from: ")
+        if fn is None:
+            return
+        with open(fn, 'r') as f:
+            res = json.load(f)
+        self.imagePath = res["imagePath"]
+        self.imp = IJ.openImage(self.imagePath)
+        self.imp.show()
+        for e in res["data"]:
+            if e["type"] == 5:
+                self.roi[e["name"]] = Line(e["ox1"], e["oy1"], e["ox2"], e["oy2"])
+            elif e["type"] == 10:
+                self.roi[e["name"]] = PointRoi(e["ox"], e["oy"])
+        tblModel = self.tbl.getModel()
+        for k in self.roi:
+            tblModel.addRow([k, False])
 
     def handle_tableChanged(self, event):
         if event.getType() == 0 and event.getColumn() == 1:
