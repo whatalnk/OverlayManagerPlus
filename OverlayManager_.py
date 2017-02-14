@@ -151,17 +151,3 @@ class OverlayManager():
 
 if __name__ == '__main__':
     OverlayManager().run()
-#imp = IJ.getImage()
-#roi = imp.getRoi()
-#roi.setName("PC0202l")
-#ol = Overlay()
-#
-#gd = GenericDialogPlus("List of ROIs in the Overlay")
-#def add_to_overlay(e):
-#    ol.add(roi)
-#
-#gd.addButton("Add to Overlay", add_to_overlay)
-#gd.showDialog()
-#
-#print(ol)
-#  
