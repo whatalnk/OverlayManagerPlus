@@ -1,24 +1,16 @@
-from __future__ import with_statement
+from __future__ import with_statement, print_function
 import os
-from itertools import izip, repeat, chain
-import java.lang.Float as JFloat
+import os.path
+import json
 from ij import IJ, ImagePlus, WindowManager
-from ij.plugin.frame import RoiManager, PlugInFrame
-from ij.io import OpenDialog
-from ij.measure import ResultsTable
+from ij.plugin.frame import PlugInFrame
 from ij.gui import Overlay, GenericDialog, Line, PointRoi
-
 from fiji.util.gui import GenericDialogPlus
-from java.awt.event import ActionListener
-from java.awt import GridLayout, Dimension, GridBagLayout, GridBagConstraints
-from javax.swing import JButton, JPanel
-from javax.swing import JList, DefaultListModel
-from javax.swing import JTable, JScrollPane, BoxLayout
+import java.lang.Boolean as JBool
+from java.awt import GridLayout
+from javax.swing import JButton, JPanel, JTable, JScrollPane, BoxLayout
 from javax.swing.table import DefaultTableModel
 from javax.swing.event import TableModelListener
-import java.lang.Boolean as JBool
-import json
-import os.path
 
 class checkBoxTableModel(DefaultTableModel):
     def getColumnClass(self, col):
@@ -28,12 +20,12 @@ class checkBoxTableModel(DefaultTableModel):
             return(JBool)
 
 class checkBoxTableListener(TableModelListener):
-    def __init__(self, overlayManager):
-        self.overlayManager = overlayManager
+    def __init__(self, overlayManagerPlus):
+        self.overlayManagerPlus = overlayManagerPlus
     def tableChanged(self, event):
-        print(self.overlayManager.handle_tableChanged(event))
+        self.overlayManagerPlus.handle_tableChanged(event)
 
-class OverlayManager():
+class OverlayManagerPlus():
     def __init__(self):
         self.roi = dict()
         self.overlay = Overlay()
@@ -43,7 +35,7 @@ class OverlayManager():
             self.imp = imp
             self.imagePath = os.path.join(imp.getOriginalFileInfo().directory, imp.getOriginalFileInfo().fileName)
 
-    def run(self):
+    def run_(self):
         frame = PlugInFrame("Overlay Manager")
         frame.setSize(300, 600)
 
@@ -128,6 +120,8 @@ class OverlayManager():
             gd.showDialog()
             if gd.wasOKed():
                 tbl.getModel().removeRow(i)
+                del self.roi[v]
+                self.del_overlay(v)
 
     def save_roi(self, event):
         data = []
@@ -144,7 +138,7 @@ class OverlayManager():
             return 0
         with open(fn, 'w') as f:
             json.dump(res, f)
-    
+
     def lineRoiToDict(self, k, roi):
         p = roi.getFloatPoints()
         px = p.xpoints.tolist()
@@ -185,10 +179,14 @@ class OverlayManager():
                 # Draw
                 self.imp.setOverlay(self.overlay)
             else:
-                # Delete ROI from Overlay
-                self.overlay.remove(self.roi[roiname])
-                # Draw
-                self.imp.setOverlay(self.overlay)
+                self.del_overlay(roiname)
+
+    def del_overlay(self, roiname):
+        # Delete ROI from Overlay
+        self.overlay.remove(self.roi[roiname])
+        # Draw
+        self.imp.setOverlay(self.overlay)
 
 if __name__ == '__main__':
-    OverlayManager().run()
+    overlayManagerPlus = OverlayManagerPlus()
+    overlayManagerPlus.run_()
