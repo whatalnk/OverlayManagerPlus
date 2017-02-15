@@ -14,7 +14,6 @@ from javax.swing.event import TableModelListener
 
 class checkBoxTableModel(DefaultTableModel):
     def getColumnClass(self, col):
-        import java.lang.Boolean as JBool
         if col == 0:
             return(str)
         elif col == 1:
@@ -73,7 +72,6 @@ class OverlayManagerPlus(object):
         self.frame.visible = True
 
     def openImage(self, event):
-        from ij import IJ
         imagePath = IJ.getFilePath("Choose image")
         if imagePath is None:
             return 0
@@ -82,8 +80,6 @@ class OverlayManagerPlus(object):
         self.imp.show()
 
     def add_roi(self, event):
-        from ij import IJ
-        from ij.gui import GenericDialog
         selection = self.imp.getRoi()
         if selection is None:
             IJ.error("No selection")
@@ -107,7 +103,6 @@ class OverlayManagerPlus(object):
         self.roicount += 1
 
     def del_roi(self, event):
-        from ij.gui import GenericDialog
         tbl = self.tbl
         i = tbl.getSelectedRow()
         if i == -1:
@@ -127,8 +122,6 @@ class OverlayManagerPlus(object):
                 del self.roi[v]
 
     def save_roi(self, event):
-        import json
-        from ij import IJ
         data = []
         for k in self.roi:
             v = self.roi[k]
@@ -155,8 +148,6 @@ class OverlayManagerPlus(object):
         return(dict({"type": 10, "name": k, "ox": p.xpoints.tolist(), "oy": p.ypoints.tolist()}))
 
     def load_roi(self, event):
-        from ij import IJ
-        from ij.gui import Line, PointRoi
         fn = IJ.getFilePath("Load result from: ")
         if fn is None:
             return
