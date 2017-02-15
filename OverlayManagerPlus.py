@@ -214,9 +214,12 @@ class OverlayManagerPlus(object):
 
     def show_selection(self, event):
         i = self.tbl.getSelectedRow()
-        tblModel = self.tbl.getModel()
-        roiname = tblModel.getValueAt(i, 0)
-        self.imp.setRoi(self.roi[roiname])
+        if i == -1:
+            return
+        else:
+            tblModel = self.tbl.getModel()
+            roiname = tblModel.getValueAt(i, 0)
+            self.imp.setRoi(self.roi[roiname])
 
 if __name__ == '__main__':
     OverlayManagerPlus()
