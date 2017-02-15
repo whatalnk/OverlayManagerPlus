@@ -10,7 +10,7 @@ import java.lang.Boolean as JBool
 from java.awt import GridLayout
 from javax.swing import JButton, JPanel, JTable, JScrollPane, BoxLayout
 from javax.swing.table import DefaultTableModel
-from javax.swing.event import TableModelListener
+from javax.swing.event import TableModelListener, ListSelectionListener
 
 class checkBoxTableModel(DefaultTableModel):
     def getColumnClass(self, col):
@@ -24,6 +24,12 @@ class checkBoxTableListener(TableModelListener):
         self.overlayManagerPlus = overlayManagerPlus
     def tableChanged(self, event):
         self.overlayManagerPlus.handle_tableChanged(event)
+
+class rowSelectionListener(ListSelectionListener):
+    def __init__(self, overlayManagerPlus):
+        self.overlayManagerPlus = overlayManagerPlus
+    def valueChanged(self, event):
+        self.overlayManagerPlus.show_selection(event)
 
 class OverlayManagerPlus(object):
     def __init__(self):
@@ -49,6 +55,7 @@ class OverlayManagerPlus(object):
         self.tbl.getColumn("Overlay").setMaxWidth(100)
         self.tbl.setRowHeight(20)
         self.tbl.getColumnModel().setColumnMargin(10)
+        self.tbl.getSelectionModel().addListSelectionListener(rowSelectionListener(self))
         sp = JScrollPane(self.tbl)
         p.add(sp)
         
@@ -184,6 +191,12 @@ class OverlayManagerPlus(object):
         self.overlay.remove(self.roi[roiname])
         # Draw
         self.imp.setOverlay(self.overlay)
+
+    def show_selection(self, event):
+        i = self.tbl.getSelectedRow()
+        tblModel = self.tbl.getModel()
+        roiname = tblModel.getValueAt(i, 0)
+        self.imp.setRoi(self.roi[roiname])
 
 if __name__ == '__main__':
     OverlayManagerPlus()
