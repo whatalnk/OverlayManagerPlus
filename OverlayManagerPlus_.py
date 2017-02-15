@@ -35,15 +35,13 @@ class OverlayManagerPlus(object):
         if imp is not None:
             self.imp = imp
             self.imagePath = os.path.join(imp.getOriginalFileInfo().directory, imp.getOriginalFileInfo().fileName)
-
-    def run(self):
-        frame = PlugInFrame("Overlay Manager")
-        frame.setSize(300, 600)
+        self.frame = PlugInFrame("Overlay Manager")
+        self.frame.setSize(300, 600)
 
         # Parent
         p = JPanel()
         p.setLayout(BoxLayout(p, BoxLayout.X_AXIS))
-        frame.add(p)
+        self.frame.add(p)
 
         # Left
         tblModel = checkBoxTableModel(["ROI name", "Overlay"], 0)
@@ -72,7 +70,7 @@ class OverlayManagerPlus(object):
         b_load = JButton('Load', actionPerformed = self.load_roi)
         p2.add(b_load)
 
-        frame.visible = True
+        self.frame.visible = True
 
     def openImage(self, event):
         imagePath = IJ.getFilePath("Choose image")
@@ -189,4 +187,4 @@ class OverlayManagerPlus(object):
         self.imp.setOverlay(self.overlay)
 
 if __name__ == '__main__':
-    OverlayManagerPlus().run()
+    OverlayManagerPlus()
