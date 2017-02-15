@@ -69,6 +69,8 @@ class OverlayManagerPlus(object):
         p2.add(b_open)
         b_add_roi = JButton('Add ROI', actionPerformed = self.add_roi)
         p2.add(b_add_roi)
+        b_edit_roi = JButton('Edit ROI', actionPerformed = self.edit_roi)
+        p2.add(b_edit_roi)
         b_del_roi = JButton('Delete ROI', actionPerformed = self.del_roi)
         p2.add(b_del_roi)
         b_save = JButton('Save', actionPerformed = self.save_roi)
@@ -108,6 +110,9 @@ class OverlayManagerPlus(object):
         self.roi[s] = selection
         tblModel.addRow([s, False])
         self.roicount += 1
+    
+    def edit_roi(self, event):
+        pass
 
     def del_roi(self, event):
         tbl = self.tbl
