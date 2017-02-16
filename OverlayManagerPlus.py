@@ -188,7 +188,14 @@ class OverlayManagerPlus(object):
         tblModel = self.tbl.getModel()
         for k in self.roi:
             tblModel.addRow([k, False])
-        self.imagePath = res["imagePath"]
+        if os.path.exists(res["imagePath"]):
+            self.imagePath = res["imagePath"]
+        else:
+            IJ.error("%s was not found. Please locate." % res["imagePath"])
+            imagePath = IJ.getFilePath("Locate image")
+            if imagePath is None:
+                return 0
+            self.imagePath = imagePath
         self.imp = IJ.openImage(self.imagePath)
         self.imp.show()
 
