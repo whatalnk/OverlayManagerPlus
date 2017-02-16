@@ -182,30 +182,30 @@ class OverlayManagerPlus(object):
         tblModel.addRow([s, False])
 
     def save_roi(self, event):
-        data = []
+        data = dict()
         for k in self.roi:
             v = self.roi[k]
             t_ = v.getType()
             if t_ == 5:
-                data.append(self.lineRoiToDict(k, v)) 
+                data[k] = self.lineRoiToDict(v) 
             elif t_ == 10:
-                data.append(self.pointRoiToDict(k, v))
+                data[k] = self.pointRoiToDict(v)
         res = dict({"imagePath": self.imagePath, "data": data})
         fn = IJ.getFilePath("Save result to: ")
         if fn is None:
             return 0
         with open(fn, 'w') as f:
-            json.dump(res, f)
+            json.dump(res, f, indent=True)
 
-    def lineRoiToDict(self, k, roi):
+    def lineRoiToDict(self, roi):
         p = roi.getFloatPoints()
         px = p.xpoints.tolist()
         py = p.ypoints.tolist()
-        return(dict({"type": 5, "name": k, "ox1": px[0], "oy1": py[0], "ox2": px[1], "oy2": py[1]}))
+        return(dict({"type": 5, "ox1": px[0], "oy1": py[0], "ox2": px[1], "oy2": py[1]}))
 
-    def pointRoiToDict(self, k, roi):
+    def pointRoiToDict(self, roi):
         p = roi.getContainedFloatPoints()
-        return(dict({"type": 10, "name": k, "ox": p.xpoints.tolist(), "oy": p.ypoints.tolist()}))
+        return(dict({"type": 10, "ox": p.xpoints.tolist(), "oy": p.ypoints.tolist()}))
 
     def load_roi(self, event):
         fn = IJ.getFilePath("Load result from: ")
@@ -213,13 +213,12 @@ class OverlayManagerPlus(object):
             return
         with open(fn, 'r') as f:
             res = json.load(f)
-        for e in res["data"]:
-            if e["type"] == 5:
-                self.roi[e["name"]] = Line(e["ox1"], e["oy1"], e["ox2"], e["oy2"])
-            elif e["type"] == 10:
-                self.roi[e["name"]] = PointRoi(e["ox"], e["oy"])
         tblModel = self.tbl.getModel()
-        for k in self.roi:
+        for k, v in res["data"].items():
+            if v["type"] == 5:
+                self.roi[k] = Line(v["ox1"], v["oy1"], v["ox2"], v["oy2"])
+            elif v["type"] == 10:
+                self.roi[k] = PointRoi(v["ox"], v["oy"])
             tblModel.addRow([k, False])
         if os.path.exists(res["imagePath"]):
             self.imagePath = res["imagePath"]
@@ -240,7 +239,7 @@ class OverlayManagerPlus(object):
             roiname = tblModel.getValueAt(i, 0)
             if v:
                 # Add ROI to Overlay
-                self.overlay.add(self.roi[roiname])
+                self.overlay.add(self.roi[roiname], roiname)
                 # Draw
                 self.imp.setOverlay(self.overlay)
             else:
@@ -248,7 +247,7 @@ class OverlayManagerPlus(object):
 
     def del_overlay(self, roiname):
         # Delete ROI from Overlay
-        self.overlay.remove(self.roi[roiname])
+        self.overlay.remove(roiname)
         # Draw
         self.imp.setOverlay(self.overlay)
 
