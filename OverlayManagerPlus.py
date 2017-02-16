@@ -73,6 +73,8 @@ class OverlayManagerPlus(object):
         p2.add(b_update_roi)
         b_del_roi = JButton('Delete ROI', actionPerformed = self.del_roi)
         p2.add(b_del_roi)
+        b_rename_roi = JButton('Rename ROI', actionPerformed = self.rename_roi)
+        p2.add(b_rename_roi)
         b_save = JButton('Save', actionPerformed = self.save_roi)
         p2.add(b_save)
         b_load = JButton('Load', actionPerformed = self.load_roi)
@@ -147,6 +149,37 @@ class OverlayManagerPlus(object):
                 tbl.getModel().removeRow(i)
                 self.del_overlay(v)
                 del self.roi[v]
+
+    def rename_roi(self, event):
+        tbl = self.tbl
+        i = tbl.getSelectedRow()
+        if i == -1:
+            gd = GenericDialog("Confirm")
+            gd.addMessage("Plese select an item")
+            gd.hideCancelButton()
+            gd.showDialog()
+        else:
+            tblModel = self.tbl.getModel()
+            k_prev = tbl.getValueAt(i, 0)
+            v_prev = self.roi[k_prev]
+            del self.roi[k_prev]
+            while True:
+                gd = GenericDialog("Rename")
+                gd.addStringField("Rename %s to: " % k_prev, k_prev, 10)
+                gd.showDialog()
+                s = gd.getNextString()
+                if gd.wasCanceled():
+                    return
+                elif s == "":
+                    IJ.error("Please enter a name")
+                elif s in self.roi.keys():
+                    IJ.error("ROI name already used. Please use different one")
+                else:
+                    break
+        self.del_overlay(k_prev)
+        self.tbl.getModel().removeRow(i)
+        self.roi[s] = v_prev
+        tblModel.addRow([s, False])
 
     def save_roi(self, event):
         data = []
