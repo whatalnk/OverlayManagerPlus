@@ -214,7 +214,7 @@ class OverlayManagerPlus(object):
         with open(fn, 'r') as f:
             res = json.load(f)
         tblModel = self.tbl.getModel()
-        for k, v in res["data"].items():
+        for k, v in sorted(res["data"].items()):
             if v["type"] == 5:
                 self.roi[k] = Line(v["ox1"], v["oy1"], v["ox2"], v["oy2"])
             elif v["type"] == 10:
