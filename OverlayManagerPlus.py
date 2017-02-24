@@ -205,7 +205,8 @@ class OverlayManagerPlus(object):
 
     def pointRoiToDict(self, roi):
         p = roi.getContainedFloatPoints()
-        return(dict({"type": 10, "ox": p.xpoints.tolist(), "oy": p.ypoints.tolist()}))
+        ox, oy = zip(*sorted([(px, py) for (px, py) in zip(p.xpoints.tolist(), p.ypoints.tolist())], key=lambda k: k[0], reverse=True))
+        return(dict({"type": 10, "ox": list(ox), "oy": list(oy)}))
 
     def load_roi(self, event):
         fn = IJ.getFilePath("Load result from: ")
