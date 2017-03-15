@@ -92,6 +92,8 @@ class OverlayManagerPlus(object):
 
     def add_roi(self, event):
         selection = self.imp.getRoi()
+        if selection.getType() == 10:
+            selection.setShowLabels(True)
         if selection is None:
             IJ.error("No selection")
             return 0
@@ -220,6 +222,7 @@ class OverlayManagerPlus(object):
                 self.roi[k] = Line(v["ox1"], v["oy1"], v["ox2"], v["oy2"])
             elif v["type"] == 10:
                 self.roi[k] = PointRoi(v["ox"], v["oy"])
+                self.roi[k].setShowLabels(True)
             tblModel.addRow([k, False])
         if os.path.exists(res["imagePath"]):
             self.imagePath = res["imagePath"]
