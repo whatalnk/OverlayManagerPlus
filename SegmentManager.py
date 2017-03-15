@@ -15,6 +15,14 @@ from OverlayManagerPlus.OverlayManagerPlus import OverlayManagerPlus
 
 class SegmentManager(OverlayManagerPlus):
     def __init__(self):
+        imp = WindowManager.getCurrentImage()
+        if imp is not None:
+            self.imp = imp
+        self.roi = dict()
+        self.text = dict()
+        self.overlay = Overlay()
+        self.currentIndex = 0
+    def run(self):
         # Window
         self.frame = PlugInFrame("Segment Manager")
         self.frame.setSize(300, 600)
@@ -70,4 +78,4 @@ class SegmentManager(OverlayManagerPlus):
         pass
 
 if __name__=='__main__':
-    SegmentManager()
+    SegmentManager().run()
