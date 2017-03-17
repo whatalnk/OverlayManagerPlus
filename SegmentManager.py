@@ -8,7 +8,7 @@ from ij.gui import Overlay, GenericDialog, Line, PointRoi, TextRoi
 from fiji.util.gui import GenericDialogPlus
 import java.lang.Boolean as JBool
 from java.awt import GridLayout, Font
-from javax.swing import JButton, JPanel, JTable, JScrollPane, BoxLayout
+from javax.swing import JFrame, JButton, JPanel, JTable, JScrollPane, BoxLayout, JMenu, JMenuBar, JMenuItem
 from javax.swing.table import DefaultTableModel
 from javax.swing.event import TableModelListener, ListSelectionListener
 from OverlayManagerPlus.OverlayManagerPlus import OverlayManagerPlus
@@ -24,8 +24,8 @@ class SegmentManager(OverlayManagerPlus):
         self.currentIndex = 0
     def run(self):
         # Window
-        self.frame = PlugInFrame("Segment Manager")
-        self.frame.setSize(300, 600)
+        self.frame = JFrame("Segment Manager")
+        self.frame.setSize(200, 600)
 
         # Parent
         p = JPanel()
@@ -33,42 +33,57 @@ class SegmentManager(OverlayManagerPlus):
         self.frame.add(p)
 
         # Child, left
-        tblModel = DefaultTableModel(["Index", "Length"], 0)
+        tblModel = DefaultTableModel(["Index", "Col1"], 0)
         self.tbl = JTable(tblModel)
-        self.tbl.getColumn("Index").setMaxWidth(100)
+        self.tbl.getColumn("Index").setMaxWidth(50)
         self.tbl.setRowHeight(20)
         self.tbl.getColumnModel().setColumnMargin(10)
         sp = JScrollPane(self.tbl)
         p.add(sp)
 
-        # Child, right
-        p2 = JPanel()
-        p2.setLayout(GridLayout(15, 1))
-        p.add(p2)
+        # Menu
+        menubar = JMenuBar()
 
-        ## Right component
-        b_open = JButton('Open Image', actionPerformed = self.openImage)
-        p2.add(b_open)
-        b_add_col = JButton("Add column", actionPerformed = self.add_col)
-        p2.add(b_add_col)
-        b_del_col = JButton("Delete column", actionPerformed = self.del_col)
-        p2.add(b_del_col)
-        b_add = JButton("Add segment", actionPerformed = self.add_row)
-        p2.add(b_add)
-        b_edit = JButton("Edit segment", actionPerformed = self.edit_row)
-        p2.add(b_edit)
-        b_del = JButton("Delete segment", actionPerformed = self.delete_row)
-        p2.add(b_del)
-        b_ren_i = JButton("Rename index", actionPerformed = self.rename_index)
-        p2.add(b_ren_i)
-        b_ren_col = JButton("Rename column", actionPerformed = self.rename_column)
-        p2.add(b_ren_col)
-        b_load_pointroi = JButton("Load PointRoi", actionPerformed = self.load_pointroi)
-        p2.add(b_load_pointroi)
-        b_load_segments = JButton("Load Segments", actionPerformed = self.load_segments)
-        p2.add(b_load_segments)
-        b_save = JButton("Save", actionPerformed = self.save_segments)
-        p2.add(b_save)
+        menu_file = JMenu("File")
+        menubar.add(menu_file)
+        
+        menuitem_open = JMenuItem("Open Image")
+        menuitem_load_pointroi = JMenuItem("Load PointRoi")
+        menuitem_load_segments = JMenuItem("Load Segments")
+        menu_file.add(menuitem_open)
+        menu_file.add(menuitem_load_pointroi)
+        menu_file.add(menuitem_load_segments)
+
+
+        menu_row = JMenu("Row")
+        menubar.add(menu_row)
+        
+        menuitem_rename_row = JMenuItem("Rename")
+        menuitem_del_row = JMenuItem("Delete")
+        menu_row.add(menuitem_rename_row)
+        menu_row.add(menuitem_del_row)
+
+        menu_col = JMenu("Column")
+        menubar.add(menu_col)
+        
+        menuitem_add_col = JMenuItem("Add")
+        menuitem_rename_col = JMenuItem("Rename")
+        menuitem_del_col = JMenuItem("Delete")
+        menu_col.add(menuitem_add_col)
+        menu_col.add(menuitem_rename_col)
+        menu_col.add(menuitem_del_col)
+
+        menu_data = JMenu("Data")
+        menubar.add(menu_data)
+
+        menuitem_add_data = JMenuItem("Add")
+        menuitem_edit_data = JMenuItem("Edit")
+        menuitem_del_data = JMenuItem("Delete")
+        menu_data.add(menuitem_add_data)
+        menu_data.add(menuitem_edit_data)
+        menu_data.add(menuitem_del_data)
+
+        self.frame.setJMenuBar(menubar)
 
         self.frame.visible = True
 
