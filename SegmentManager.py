@@ -49,20 +49,34 @@ class SegmentManager(OverlayManagerPlus):
         ## Right component
         b_open = JButton('Open Image', actionPerformed = self.openImage)
         p2.add(b_open)
-        b_add = JButton("Add", actionPerformed = self.add_row)
+        b_add_col = JButton("Add column", actionPerformed = self.add_col)
+        p2.add(b_add_col)
+        b_del_col = JButton("Delete column", actionPerformed = self.del_col)
+        p2.add(b_del_col)
+        b_add = JButton("Add segment", actionPerformed = self.add_row)
         p2.add(b_add)
-        b_edit = JButton("Edit", actionPerformed = self.edit_row)
+        b_edit = JButton("Edit segment", actionPerformed = self.edit_row)
         p2.add(b_edit)
-        b_del = JButton("Delete", actionPerformed = self.delete_row)
+        b_del = JButton("Delete segment", actionPerformed = self.delete_row)
         p2.add(b_del)
         b_ren_i = JButton("Rename index", actionPerformed = self.rename_index)
         p2.add(b_ren_i)
         b_ren_col = JButton("Rename column", actionPerformed = self.rename_column)
         p2.add(b_ren_col)
+        b_load_pointroi = JButton("Load PointRoi", actionPerformed = self.load_pointroi)
+        p2.add(b_load_pointroi)
+        b_load_segments = JButton("Load Segments", actionPerformed = self.load_segments)
+        p2.add(b_load_segments)
         b_save = JButton("Save", actionPerformed = self.save_segments)
         p2.add(b_save)
 
         self.frame.visible = True
+
+    def add_col(self, event):
+        pass
+
+    def del_col(self, event):
+        pass
 
     def add_row(self, event):
         selection = self.imp.getRoi()
@@ -93,6 +107,15 @@ class SegmentManager(OverlayManagerPlus):
         pass
 
     def save_segments(self, event):
+        pass
+
+    def load_pointroi(self, event):
+        pass
+
+    def point2segment(self):
+        pass
+
+    def load_segments(self, event):
         pass
 
 if __name__=='__main__':
